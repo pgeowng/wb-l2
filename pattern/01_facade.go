@@ -78,7 +78,7 @@ func NewProfileFacade() (*ProfileFacade, error) {
 }
 
 type Profile struct {
-	*SocialData
+	SocialData
 	history []Track
 }
 
@@ -90,10 +90,10 @@ func (pf *ProfileFacade) GetProfile(uid string) (*Profile, error) {
 	}
 
 	history := pf.hist.GetUser(uid)
-	return &Profile{social, history}, nil
+	return &Profile{*social, history}, nil
 }
 
-func main() {
+func useFacade() {
 	pf, err := NewProfileFacade()
 	if err != nil {
 		log.Fatal(err)
@@ -104,5 +104,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	fmt.Println(profile)
+	fmt.Printf("%+v", profile)
 }
+
+// &{SocialData:{followers:87 following:47} history:[{id:2081} {id:41318} {id:54425} {id:22540} {id:40456}]}
