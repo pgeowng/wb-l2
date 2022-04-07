@@ -8,14 +8,25 @@ import "fmt"
 	https://en.wikipedia.org/wiki/Visitor_pattern
 */
 
-// Паттерн Visitor - behavior pattern
+// Visitor - behavior pattern
 // Заключается в добавлении нового поведения, через дополнительный класс, которому мы дали доступ.
+// Паттерн полезен, если:
+//   + нужно реализовать новое поведение, при этом минимально изменяя исходный класс и/или
+//     используя уже готовый алгоритм.
+//     Например, в spreadsheet для cell реализован MathVisitor,
+//     который вычисляет значение по формуле.
+//     И мы добавляем StyleVisitor, который изменяет оформление на основе значения ячейки.
+//   + необходимо работать с сложной структурой классов.
+//     Например, мы отрисовываем объекты используя древовидную структуру для игровой сцены.
 
-// Класс Visitor не имеет доступ к приватным полям и методам, что
-// менее гибко, чем метод на объекте.
+// - Класс Visitor не имеет доступ к приватным полям и методам, что
+//   менее гибко, чем метод на объекте.
+// - Добавление нового класса в иерархию заставляет добавить поведение во всех посетителей.
 
 // Visitable ---
-
+// У нас есть некоторый набор классов, в который мы хотим добавить поведение.
+// Запросим, чтобы этот набор содержал метод accept. Это необходимо, чтобы каждый объект решил
+// для себя какую реализацию метода использовать.
 type Node interface {
 	accept(Visitor)
 }
@@ -29,6 +40,7 @@ func NewFile(name string, size uint) *File {
 	return &File{name, size}
 }
 
+// Определяем, что File будет использовать реализацию с своим типом.
 func (f *File) accept(v Visitor) {
 	v.visitFile(f)
 }
@@ -48,6 +60,7 @@ func (d *Directory) accept(v Visitor) {
 
 // Visitors ---
 
+// Определяем, что посетитель обрабатывает данные классы.
 type Visitor interface {
 	visitDirectory(*Directory)
 	visitFile(*File)
@@ -69,6 +82,12 @@ func (du *DiskUsage) HumanSize(size uint) string {
 	return fmt.Sprintf("%4d%s", size, letter[idx])
 }
 
+// Данные методы могли бы быть реализованы напрямую у File и Directory.
+// file.printSize -> <code>
+// dir.printSize  -> <code>
+// Но теперь они отвязаны, и исходный класс не знает о их существовании.
+// file.accept -> visitor.visitFile -> <code>
+// dir.accept  -> visitor.visitDir  -> <code>
 func (du *DiskUsage) visitFile(f *File) {
 	du.sizeAcc += f.size
 	fmt.Printf("%s %s%s\n", du.HumanSize(f.size), du.currPath, f.name)
