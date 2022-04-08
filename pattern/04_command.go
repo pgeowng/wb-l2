@@ -25,6 +25,8 @@ import (
 // - Появление дополнительно слоя, который напрямую зависит от бизнес логики.
 //   Необходимо менять вместе и поддерживать.
 
+// Объявляем интерфейс который может вызваться и
+// проверить возможность исполнения.
 type Command interface {
 	Execute()
 	Test() bool
@@ -37,7 +39,7 @@ type Order struct {
 }
 
 // Command 1 ---
-
+// Комманды используют Market в качестве цели исполнения.
 type BuyOrder struct{ Order }
 
 func NewBuyOrder(market Market, target string, price int) *BuyOrder {
@@ -54,7 +56,6 @@ func (o *BuyOrder) Test() bool {
 }
 
 // Command 2 ---
-
 type SellOrder struct{ Order }
 
 func NewSellOrder(market Market, target string, price int) *SellOrder {
@@ -69,7 +70,7 @@ func (o *SellOrder) Test() bool {
 }
 
 // Receiver ---
-
+// Предоставляем некоторые действия с собой.
 type Market interface {
 	Buy(target string)
 	Sell(target string)
@@ -108,6 +109,7 @@ func (s *Steam) Update() {
 }
 
 // Invoker --
+// Как-то добавляем комманды и проверяем возможность исполнения
 func useCommand() {
 	startBalance := 150
 	steam := NewSteam(startBalance)
