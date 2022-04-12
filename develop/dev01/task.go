@@ -1,5 +1,14 @@
 package main
 
+import (
+	"flag"
+	"fmt"
+	"os"
+	"time"
+
+	"github.com/beevik/ntp"
+)
+
 /*
 === Базовая задача ===
 
@@ -12,6 +21,29 @@ package main
 Программа должна проходить проверки go vet и golint.
 */
 
+// go run . -a example
 func main() {
+	var url string
 
+	flag.StringVar(&url, "a", "0.beevik-ntp.pool.ntp.org", "Set custom ntp server address")
+
+	flag.Parse()
+
+	response, err := ntp.Query(url)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "query error: %v\n", err)
+		os.Exit(1)
+	}
+
+	err = response.Validate()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "response error: %v\n", err)
+		os.Exit(2)
+	}
+
+	now := time.Now()
+	srv := now.Add(response.ClockOffset)
+	fmt.Println("Time:", now.Format("15:04:05.00000"))
+	fmt.Println("NTP: ", srv.Format("15:04:05.00000"))
+	fmt.Println("Offset:", response.ClockOffset)
 }
