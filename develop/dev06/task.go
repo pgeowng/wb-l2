@@ -1,5 +1,11 @@
 package main
 
+import (
+	"io"
+	"log"
+	"os"
+)
+
 /*
 === Утилита cut ===
 
@@ -13,6 +19,26 @@ package main
 Программа должна проходить все тесты. Код должен проходить проверки go vet и golint.
 */
 
-func main() {
+type Cut struct {
+	delimiter rune
+	fieldCond func(idx int) bool
+	separated bool
 
+	r io.Reader
+}
+
+func NewCut(r io.Reader) *Cut {
+	return &Cut{r: r}
+}
+
+func (c *Cut) Read(p []byte) (n int, err error) {
+	c.r.Read()
+}
+
+func main() {
+	cut := NewCut(os.Stdin)
+
+	if _, err := io.Copy(os.Stdout, cut); err != nil {
+		log.Fatal(err)
+	}
 }

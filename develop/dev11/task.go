@@ -1,5 +1,7 @@
 package main
 
+import "github.com/nats-io/nats-server/server"
+
 /*
 === HTTP server ===
 
@@ -23,5 +25,17 @@ package main
 */
 
 func main() {
+	srv := server.New()
 
+	index := srv.Route("/", server.Logger)
+
+	index.Get("/events_for_day")
+	index.Get("/events_for_week")
+	index.Get("/events_for_month")
+
+	index.Post("/create_event")
+	index.Post("/update_event")
+	index.Post("/delete_event")
+
+	srv.Listen(":1315")
 }
