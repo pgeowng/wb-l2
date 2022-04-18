@@ -1,27 +1,31 @@
 package main
 
+import (
+	"flag"
+)
+
 type Config struct {
-	after int
+	after  int
 	before int
 
-	count bool
-	ignoreCase bool
-	invert bool
-	fixed bool
+	count       bool
+	ignoreCase  bool
+	invert      bool
+	fixed       bool
 	lineNumbers bool
 
-	expr string
+	expr     string
 	filename string
 }
 
 func Cfg() *Config {
 	cfg := &Config{}
 
-	around := 0
+	context := 0
 
-	flag.InvVar(&cfg.after, "A", 0, "Print +N rows after match")
+	flag.IntVar(&cfg.after, "A", 0, "Print +N rows after match")
 	flag.IntVar(&cfg.before, "B", 0, "Print +N rows before match")
-	flag.IntVar(&around, "C", 0, "Print +N rows around match")
+	flag.IntVar(&context, "C", 0, "Print +N rows around match")
 	flag.BoolVar(&cfg.count, "c", false, "Print amount of matched lines")
 	flag.BoolVar(&cfg.ignoreCase, "i", false, "Case-insensitive matching")
 	flag.BoolVar(&cfg.invert, "v", false, "Inverted matching")
@@ -30,19 +34,23 @@ func Cfg() *Config {
 
 	flag.Parse()
 
-	if around > cfg.after {
-		cfg.after = around
+	if context > cfg.after {
+		cfg.after = context
 	}
 
-	if around > cfg.before {
-		cfg.before = around
+	if context > cfg.before {
+		cfg.before = context
 	}
+
+	args := flag.Args()
 
 	if len(args) > 1 {
-		cfg.file = args[1]
+		cfg.filename = args[1]
 	}
 
-	cfg.expr = args[0]
+	if len(args) > 0 {
+		cfg.expr = args[0]
+	}
 
 	return cfg
 }
