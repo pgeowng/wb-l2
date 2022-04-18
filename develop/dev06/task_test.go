@@ -5,59 +5,111 @@ import (
 	"testing"
 )
 
-func TestCut(t *testing.T) {
-	tests := []struct{
+func TestParseFields(t *testing.T) {
+	tests := []struct {
 		input string
-		result string
-		d []byte
-		fromField int
-		toField int
-		silent bool
+		left  int
+		right int
+		err   bool
+	}{
+		{"-", 1, 1, true},
+		{"0", 1, 1, true},
+		{"1", 1, 1, false},
+		{"1-", 1, -1, false},
+		{"1-0", 1, -1, true},
+		{"1-2", 1, 2, false},
+		{"-2", -1, 2, false},
+		{"-0", -1, 2, true},
+		{"1--1", 0, 0, true},
+	}
+
+	for _, test := range tests {
+		left, right, err := ParseFields(test.input)
+		if test.err {
+			if err == nil {
+				t.Logf("for %v expected error, got result: %v %v", test.input, left, right)
+				t.Fail()
+			}
+		} else {
+			if err != nil {
+				t.Logf("for %v expected result, got error: %v", test.input, err)
+				t.Fail()
+			} else if left != test.left || right != test.right {
+				t.Logf("for %v expected result mismatch", test.input)
+				t.Logf("expected: l:%v r:%v", test.left, test.right)
+				t.Logf("got: l:%v r:%v", left, right)
+				t.Fail()
+			}
+
+		}
+	}
+
+}
+
+func TestCut(t *testing.T) {
+	tests := []struct {
+		cfg    *Config
+		input  string
+		output string
+		err    bool
 	}{
 		{
-			"go.mod\ntask.go\ntask_test.go",
-			"\n\n",
-			[]byte("t"),
-			1, 1, true,
+			&Config{leftField: 2, rightField: 2, delimiter: " ", onlyDelimited: false},
+			"a b\na\nc c",
+			"b\na\nc\n",
+			false,
+		}, {
+			&Config{leftField: 2, rightField: 2, delimiter: " ", onlyDelimited: false},
+			"a b\na \nc c",
+			"b\n\nc\n",
+			false,
 		},
 		{
-			"go.mod\ntask.go\ntask_test.go",
-			"ask.go\nask_\n",
-			[]byte("t"),
-			2, 2, true,
+			&Config{leftField: 2, rightField: -1, delimiter: " ", onlyDelimited: false},
+			"a b\na\nc g t",
+			"b\na\ng t\n",
+			false,
 		},
 		{
-			"go.mod\ntask.go\ntask_test.go",
-			"\nes\n",
-			[]byte("t"),
-			3, 3, true,
+			&Config{leftField: -1, rightField: 2, delimiter: " ", onlyDelimited: false},
+			"a b\na\nc g t",
+			"a b\na\nc g\n",
+			false,
 		},
 		{
-			"go.mod\ntask.go\ntask_test.go",
-			"\n.go\n",
-			[]byte("t"),
-			4, 4, true,
+			&Config{leftField: -1, rightField: 2, delimiter: " ", onlyDelimited: true},
+			"a b\na\nc g t",
+			"a b\nc g\n",
+			false,
 		},
 		{
+			&Config{leftField: 3, rightField: 9, delimiter: "t", onlyDelimited: true},
 			"go.mod\ntask.go\ntask_test.go",
-			"\n.go\n",
-			[]byte("t"),
-			5, 5, true,
+			"\nest.go\n",
+			false,
 		},
 	}
-	strings.NewReader("hello world")
 
-
-
-	    s := newContainerStats() // Replace this the appropriate constructor
-    var b bytes.Buffer
-    if err := s.Process(&b); err != nil {
-        t.Fatalf("s.Display() gave error: %s", err)
-    }
-    got := b.String()
-    want := "hello world\n"
-    if got != want {
-        t.Errorf("s.Display() = %q, want %q", got, want)
-    }
-}
+	for idx, test := range tests {
+		input := strings.NewReader(test.input)
+		output := &strings.Builder{}
+		prog := NewCut(test.cfg)
+		err := prog.Run(input, output)
+		if test.err {
+			if err == nil {
+				t.Logf("for %#v test expected err, got result", idx)
+				t.Fail()
+			}
+		} else {
+			if err != nil {
+				t.Logf("for %#v test expected result, got err", idx)
+				t.Fail()
+			} else if test.output != output.String() {
+				t.Logf("for %#v test expected result mismatch\n", idx)
+				t.Logf("expected: %#v\n", test.output)
+				t.Logf("got: %#v\n", output.String())
+				t.Fail()
+			}
+		}
+	}
 }
