@@ -207,3 +207,16 @@ func main() {
 	}
 	prog.Run(os.Stdin, os.Stdout, os.Stderr)
 }
+
+// $ go run .
+// Hello from go-shell! You can use:
+//   help                  - show this message
+//   exit                  - exit shell :(
+//   cd [path]             - change directory
+//   pwd                   - current directory
+//   echo [...args]        - prints to stdout args
+//   kill <pid>            - kill process by id
+//   <any PATH executable> - execute file from PATH
+//   <cmd1> | <cmd2>       - pipe <cmd1> stdout to <cmd2> stdin
+//   <cmd1> &              - run <cmd1> in background
+// /home/dt/gohigh/wb/wb-l2/develop/dev08 $
