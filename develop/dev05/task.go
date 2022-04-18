@@ -128,7 +128,7 @@ func (p *Program) Run(r io.Reader, w io.Writer) error {
 }
 
 func main() {
-	cfg := Cfg()
+	cfg := NewConfig()
 
 	grep, err := NewGrep(cfg)
 	if err != nil {

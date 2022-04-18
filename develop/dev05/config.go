@@ -18,7 +18,7 @@ type Config struct {
 	filename string
 }
 
-func Cfg() *Config {
+func NewConfig() *Config {
 	cfg := &Config{}
 
 	context := 0

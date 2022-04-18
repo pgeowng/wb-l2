@@ -260,9 +260,7 @@ func TestProgram(t *testing.T) {
 			if err != nil {
 				t.Logf("for %#v test expected result, got err", idx)
 				t.Fail()
-			}
-
-			if test.output != output.String() {
+			} else if test.output != output.String() {
 				t.Logf("for %#v test expected result mismatch\n", idx)
 				t.Logf("expected: %#v\n", test.output)
 				t.Logf("got: %#v\n", output.String())
