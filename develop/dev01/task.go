@@ -47,3 +47,8 @@ func main() {
 	fmt.Println("NTP: ", srv.Format("15:04:05.00000"))
 	fmt.Println("Offset:", response.ClockOffset)
 }
+
+// $ go run .
+// Time: 11:08:58.88030
+// NTP:  11:08:58.88009
+// Offset: -208.97µs

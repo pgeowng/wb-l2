@@ -169,3 +169,6 @@ func main() {
 		os.Exit(3)
 	}
 }
+
+// echo "linux" | go run . -d "n" -f 2
+// ux

@@ -158,3 +158,7 @@ func main() {
 		os.Exit(3)
 	}
 }
+
+// echo "aba\nbab\ncab" | go run . "ba"
+// aba
+// bab

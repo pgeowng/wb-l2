@@ -96,8 +96,6 @@ func Unpack(input string) (string, error) {
 	return result.String(), nil
 }
 
-// echo "a2b3c4" | go run .
-// aabbbcccc
 func main() {
 	scanner := bufio.NewScanner(os.Stdin)
 	for scanner.Scan() {
@@ -113,3 +111,6 @@ func main() {
 		os.Exit(1)
 	}
 }
+
+// echo "a2b3c4" | go run .
+// aabbbcccc

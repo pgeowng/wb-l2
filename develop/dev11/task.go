@@ -1,6 +1,17 @@
 package main
 
-import "github.com/nats-io/nats-server/server"
+import (
+	"context"
+	"fmt"
+	"os"
+	"os/signal"
+	"strconv"
+	"time"
+
+	"github.com/pgeowng/wb-l2/develop/dev11/calendar"
+	"github.com/pgeowng/wb-l2/develop/dev11/routes"
+	"github.com/pgeowng/wb-l2/develop/dev11/server"
+)
 
 /*
 === HTTP server ===
@@ -25,17 +36,45 @@ import "github.com/nats-io/nats-server/server"
 */
 
 func main() {
-	srv := server.New()
+	PORT := os.Getenv("PORT")
 
-	index := srv.Route("/", server.Logger)
+	if port, err := strconv.ParseInt(PORT, 10, 0); err != nil || port > 65535 || port < 0 {
+		fmt.Println("srv: bad PORT value:", PORT)
+		os.Exit(1)
+	}
 
-	index.Get("/events_for_day")
-	index.Get("/events_for_week")
-	index.Get("/events_for_month")
+	srv := server.New(":" + PORT)
 
-	index.Post("/create_event")
-	index.Post("/update_event")
-	index.Post("/delete_event")
+	cal := calendar.NewCalendar()
+	routes := routes.NewRoutes(cal)
 
-	srv.Listen(":1315")
+	logger := server.LoggerMW
+
+	srv.Get("/", routes.QueryBuilder(calendar.All), logger)
+	srv.Get("/events_for_day", routes.QueryBuilder(calendar.DayRange), logger)
+	srv.Get("/events_for_week", routes.QueryBuilder(calendar.WeekRange), logger)
+	srv.Get("/events_for_month", routes.QueryBuilder(calendar.MonthRange), logger)
+
+	srv.Post("/create_event", routes.CreateEvent, logger)
+	srv.Post("/update_event", routes.UpdateEvent, logger)
+	srv.Post("/delete_event", routes.DeleteEvent, logger)
+
+	interrupt := make(chan os.Signal, 1)
+	signal.Notify(interrupt, os.Interrupt)
+
+	go func() {
+		<-interrupt
+		signal.Stop(interrupt)
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
+		err := srv.Shutdown(ctx)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+	}()
+
+	if err := srv.Listen(); err != nil {
+		fmt.Println(err)
+	}
 }

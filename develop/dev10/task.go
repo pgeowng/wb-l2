@@ -110,5 +110,4 @@ func main() {
 	}
 	fmt.Println("STDIN CLOSED")
 	tc.Close()
-
 }

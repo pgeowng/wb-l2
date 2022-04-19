@@ -63,3 +63,11 @@ func main() {
 	fmt.Printf("done after %v", time.Since(start))
 
 }
+
+// $ go run .
+// 2 100.18847ms
+// 3 300.497629ms
+// 5 500.76971ms
+// 7 701.087599ms
+// 11 900.320515ms
+// done after 900.336815ms%
