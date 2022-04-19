@@ -35,42 +35,6 @@ import (
 Программа должна проходить все тесты. Код должен проходить проверки go vet и golint.
 */
 
-// func GetKeys(field string, left int, right int, leading bool) (string, error) {
-// 	8
-// }
-
-// type Cmp func(arr []string, i, j int) bool
-// type Algo interface {
-// 	AddEntry(string)
-// 	Perform(Cmp) error
-// 	Result()
-// }
-
-// type Program struct {
-// 	Algo
-// }
-
-// type Sort struct {
-// 	entries []string
-// }
-
-// func (s *Sort) AddEntry(entry string) {
-// 	s.entries = append(s.entries, entry)
-// }
-
-// func (s *Sort) Perform(cmp Cmp) error {
-// 	sort.Slice(s.entries, func(i, j int) bool {
-// 		return cmp(s.entries, i, j)
-// 	})
-// 	return nil
-// }
-
-// func (s *Sort) Result() {
-// 	for _, entry := range s.entries {
-// 		fmt.Fprintln(os.Stdout, entry)
-// 	}
-// }
-
 func LexicalCmp(a, b string) bool {
 	return a < b
 }
