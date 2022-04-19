@@ -31,6 +31,11 @@ func main() {
 
 Ответ:
 ```
-...
+Программа выведет error
 
+Как и в 3 задаче, err = test() сохраняет внутрь интерфейса (*customError, nil),
+который не равен nil. Только nil interface - interface{}(nil) равен nil
+
+Возможным решением будет изменить на func test() error.
+Тогда при return nil будет возвращаться (nil, nil), который равен nil.
 ```
